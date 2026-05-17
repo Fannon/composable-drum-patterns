@@ -12,11 +12,6 @@ Perc/Foley). Stack compatible clips to build full drum parts.
 | --- | --- |
 | [<img src="assets/screenshot-browse.png" alt="Browse mode screenshot" width="420">](assets/screenshot-browse.png) | [<img src="assets/screenshot-combine.png" alt="Combine mode screenshot" width="420">](assets/screenshot-combine.png) |
 
-## Creation Notice
-
-This project was created with the help of coding agents. The MIDI pattern
-library was also created with assistance from coding agents.
-
 ## Features
 
 - **Browse** patterns by group (Kick, Snare, Hats, Toms, Perc) and collection
@@ -40,6 +35,11 @@ Every abstract drum sound has a browser playback sample:
 
 Drum pattern synthesis uses the Web Audio API with additional synthesized drum
 sounds as fallback.
+
+## Creation Notice
+
+This project was created with the help of coding agents. The MIDI pattern
+library was also created with assistance from coding agents.
 
 ## License
 
