@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Composable Drum Patterns</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div>
+        <h1>Composable Drum Patterns</h1>
+        <p>Browsable drum-pattern clips with browser playback and MIDI export across multiple layouts.</p>
+      </div>
+      <nav class="view-tabs" aria-label="Views">
+        <button class="tab is-active" data-view="browse">Browse</button>
+        <button class="tab" data-view="combine">Combine</button>
+      </nav>
+    </header>
+    <main>
+      <section id="browseView" class="view is-active">
+        <div class="toolbar">
+          <div class="segmented" id="groupTabs" aria-label="Drum groups"></div>
+          <label class="field">
+            <span>Collection</span>
+            <select id="collectionFilter"><option value="all">All</option></select>
+          </label>
+          <label class="field grow">
+            <span>Search</span>
+            <input id="searchInput" type="search" placeholder="name, id, tag, sound" />
+          </label>
+          <label class="field compact">
+            <span>Layout</span>
+            <select id="layoutSelect"></select>
+          </label>
+        </div>
+        <div class="relation-panel">
+          <div>
+            <h2 id="groupTitle"></h2>
+            <p id="groupSummary"></p>
+          </div>
+          <div id="clusterLegend" class="legend"></div>
+        </div>
+        <div id="patternGrid" class="pattern-grid"></div>
+      </section>
+      <section id="combineView" class="view">
+        <div class="combine-top">
+          <div>
+            <h2>Clip Launcher</h2>
+            <p>Pick one clip per group, audition the stack, then export a single GM drum MIDI file.</p>
+          </div>
+          <div class="transport">
+            <div class="tempo-control">
+              <button id="tempoDown" title="-4 BPM" aria-label="Decrease tempo by 4">-4</button>
+              <label class="tempo-field" aria-label="Tempo in BPM">
+                <input id="tempoField" type="number" min="20" max="400" step="1" />
+                <span>BPM</span>
+              </label>
+              <button id="tempoUp" title="+4 BPM" aria-label="Increase tempo by 4">+4</button>
+            </div>
+            <button id="downloadComboBtn" class="toolbar-button download-button">
+              <svg class="toolbar-icon" aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M12 3v11"></path>
+                <path d="m7 10 5 5 5-5"></path>
+                <path d="M5 21h14"></path>
+              </svg>
+              <span>Download MIDI</span>
+            </button>
+            <button id="randomizeComboBtn" class="toolbar-button randomize-button" title="Randomize selected clips from the current filters">
+              <svg class="toolbar-icon" aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M16 3h5v5"></path>
+                <path d="M4 20 21 3"></path>
+                <path d="M21 16v5h-5"></path>
+                <path d="M15 15 21 21"></path>
+                <path d="M4 4l5 5"></path>
+              </svg>
+              <span>Randomize</span>
+            </button>
+            <button id="playComboBtn" class="icon-button play transport-toggle" aria-pressed="false">
+              <span class="transport-icon" aria-hidden="true"></span>
+              <span class="transport-label">Play Mix</span>
+            </button>
+          </div>
+        </div>
+        <div id="selectedRack" class="selected-rack"></div>
+        <div class="launcher-tools">
+          <label class="field grow">
+            <span>Find clips</span>
+            <input id="combineSearch" type="search" placeholder="filter clips" />
+          </label>
+          <label class="field compact">
+            <span>Collection</span>
+            <select id="combineCollection"><option value="all">All</option></select>
+          </label>
+        </div>
+        <div id="launcher" class="launcher"></div>
+      </section>
+    </main>
+    <template id="patternCardTemplate">
+      <article class="pattern-card">
+        <div class="card-head">
+          <div>
+            <div class="id"></div>
+            <h3></h3>
+          </div>
+          <button class="icon-button play preview-toggle" title="Play preview" aria-label="Play preview" aria-pressed="false">
+            <span class="transport-icon" aria-hidden="true"></span>
+          </button>
+        </div>
+        <div class="meta"></div>
+        <div class="mini-roll"></div>
+        <div class="card-foot">
+          <button class="select">Use in mix</button>
+          <button class="download download-midi">Download MIDI</button>
+        </div>
+      </article>
+    </template>
+    <script src="catalog.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
