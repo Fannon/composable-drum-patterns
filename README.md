@@ -8,6 +8,10 @@ Browse, preview, and combine over 2,500 single-group drum clips. Each pattern is
 a self-contained MIDI clip for one drum group (Kick, Snare, Hats, Toms/Fills, or
 Perc/Foley). Stack compatible clips to build full drum parts.
 
+| Browse | Combine |
+| --- | --- |
+| [<img src="assets/screenshot-browse.png" alt="Browse mode screenshot" width="420">](assets/screenshot-browse.png) | [<img src="assets/screenshot-combine.png" alt="Combine mode screenshot" width="420">](assets/screenshot-combine.png) |
+
 ## Creation Notice
 
 This project was created with the help of coding agents. The MIDI pattern
