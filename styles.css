@@ -55,6 +55,7 @@ h3 { font-size: 0.95rem; line-height: 1.2; }
 .segmented button:last-child { border-radius: 0 6px 6px 0; }
 .segmented button.is-active { z-index: 1; background: var(--ink); color: #fff; border-color: var(--ink); }
 .segmented button:focus-visible { z-index: 2; }
+.segmented button[data-group="All"] { border-bottom-color: var(--line); }
 .segmented button[data-group="All"].is-active { background: var(--ink); border-color: var(--ink); }
 .segmented button[data-group="Kick"] { border-bottom-color: var(--kick); }
 .segmented button[data-group="Kick"].is-active { background: var(--kick); border-color: var(--kick); }
