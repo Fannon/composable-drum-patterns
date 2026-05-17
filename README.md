@@ -8,6 +8,11 @@ Browse, preview, and combine over 2,500 single-group drum clips. Each pattern is
 a self-contained MIDI clip for one drum group (Kick, Snare, Hats, Toms/Fills, or
 Perc/Foley). Stack compatible clips to build full drum parts.
 
+## Creation Notice
+
+This project was created with the help of coding agents. The MIDI pattern
+library was also created with assistance from coding agents.
+
 ## Features
 
 - **Browse** patterns by group (Kick, Snare, Hats, Toms, Perc) and collection
@@ -16,17 +21,17 @@ Perc/Foley). Stack compatible clips to build full drum parts.
 - **Combine** one clip from each group into a full stack with synchronized
   playback
 - **Export** individual or combined patterns as MIDI files, generated in-browser
-- Search by name, ID, tag, genre, sound, or concept
+- Search by name, ID, tag, genre, or sound
 
 ## Credits
 
 Audio samples are sourced from [Sampled](https://github.com/oramics/sampled)
-(CC0 / public domain), a curated collection of open-license instrument samples:
+(CC0 / public domain), a curated collection of open-license instrument samples.
+Every abstract drum sound has a browser playback sample:
 
-- Roland TR-505 (rim, clap, snare, hi-hats, crash, toms)
-- Roland TR-808 (shaker)
-- LinnDrum LM-2 (tambourine)
-- Pearl Master Studio / AVL Drumkits (ride)
+- Roland TR-505: kick, rim, clap, snare, hi-hats, crash, ride, ride bell, cowbell, toms
+- Roland TR-808: kick B, shaker
+- LinnDrum LM-2: tambourine
 
 Drum pattern synthesis uses the Web Audio API with additional synthesized drum
 sounds as fallback.

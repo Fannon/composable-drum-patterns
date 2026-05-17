@@ -4,17 +4,21 @@
   const groups = catalog.groups;
   const colors = { Kick: "var(--kick)", Snare: "var(--snare)", Hats: "var(--hats)", Toms: "var(--toms)", Perc: "var(--perc)" };
   const groupLabels = { Kick: "Kick", Snare: "Snare", Hats: "Hats", Toms: "Toms / Fills", Perc: "Perc / Foley" };
-  const gmNotes = { kick: 36, kickB: 35, snare: 38, clap: 39, rimshot: 37, hatClosed: 42, hatOpen: 46, ride: 51, rideBell: 53, crash: 49, tomLow: 45, tomMid: 48, tomHigh: 50, tambourine: 54, shaker: 70 };
+  const gmNotes = { kick: 36, kickB: 35, snare: 38, clap: 39, rimshot: 37, hatClosed: 42, hatOpen: 46, ride: 51, rideBell: 53, crash: 49, tomLow: 45, tomMid: 48, tomHigh: 50, tambourine: 54, cowbell: 56, shaker: 70 };
   const sampleSources = {
+    kick: "samples/kick.wav",
+    kickB: "samples/kick-b.wav",
     rimshot: "samples/rim.wav",
     clap: "samples/clap.wav",
     snare: "samples/snare.wav",
     hatClosed: "samples/hihat-closed.wav",
     hatOpen: "samples/hihat-open.wav",
     tambourine: "samples/tambourine.wav",
+    cowbell: "samples/cowbell.wav",
     crash: "samples/crash.wav",
     shaker: "samples/shaker.wav",
     ride: "samples/ride.wav",
+    rideBell: "samples/ride-bell.wav",
     tomHigh: "samples/tom-high.wav",
     tomMid: "samples/tom-mid.wav",
     tomLow: "samples/tom-low.wav",
@@ -230,7 +234,7 @@
     return source.filter((entry) => {
       if (collection !== "all" && entry.collection !== collection) return false;
       if (!query) return true;
-      return [entry.id, entry.name, entry.collection, entry.tier, entry.concept, entry.velocityProfile ?? entry.accentProfile, ...entry.tags, ...entry.applicableGenres, ...entry.voices, ...entry.articulations, String(entry.energy), ...entry.usedSounds.map(soundLabel)]
+      return [entry.id, entry.name, entry.collection, entry.tier, ...entry.tags, ...entry.applicableGenres, ...entry.voices, ...entry.articulations, String(entry.energy), ...entry.usedSounds.map(soundLabel)]
         .filter(Boolean).join(" ").toLowerCase().includes(query);
     });
   }
@@ -602,6 +606,7 @@
     if (sound === "rideBell") return rideBell(ctx, out, time);
     if (sound === "crash") return crash(ctx, out, time);
     if (sound === "tambourine") return tambourine(ctx, out, time);
+    if (sound === "cowbell") return cowbell(ctx, out, time);
     if (sound === "shaker") return shaker(ctx, out, time);
     noise(ctx, out, time, 0.08, 6500);
   }
@@ -618,6 +623,8 @@
 
   function kick(ctx, out, time, alternate) {
     out.gain.value *= 1.15;
+    const sampled = playSample(ctx, alternate ? "kickB" : "kick", out, time, alternate ? 0.82 : 0.86, 1);
+    const level = sampled ? 0.35 : 1;
     const body = alternate ? 39 : 46;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
@@ -626,14 +633,14 @@
     osc.frequency.exponentialRampToValueAtTime(body, time + 0.085);
     osc.frequency.exponentialRampToValueAtTime(body * 0.82, time + 0.24);
     gain.gain.setValueAtTime(0.001, time);
-    gain.gain.linearRampToValueAtTime(1, time + 0.006);
+    gain.gain.linearRampToValueAtTime(level, time + 0.006);
     gain.gain.exponentialRampToValueAtTime(0.48, time + 0.045);
     gain.gain.exponentialRampToValueAtTime(0.001, time + 0.32);
     osc.connect(gain).connect(out);
     osc.start(time);
     osc.stop(time + 0.34);
     state.active.push(osc);
-    kickTransient(ctx, out, time);
+    if (!sampled) kickTransient(ctx, out, time);
   }
 
   function kickTransient(ctx, out, time) {
@@ -779,6 +786,8 @@
   }
 
   function rideBell(ctx, out, time) {
+    const sampled = playSample(ctx, "rideBell", out, time, 0.48, 1.22);
+    if (sampled) return;
     metallicNoise(ctx, out, time, 0.22, 5200, 11500);
     tone(ctx, out, time, 1180, 980, 0.18, "triangle");
   }
@@ -789,6 +798,13 @@
     jingle(ctx, out, time, 0.038, 8500, 0.46 * level);
     jingle(ctx, out, time + 0.018, 0.044, 9800, 0.34 * level);
     jingle(ctx, out, time + 0.044, 0.062, 7600, 0.28 * level);
+  }
+
+  function cowbell(ctx, out, time) {
+    const sampled = playSample(ctx, "cowbell", out, time, 0.88, 1);
+    const level = sampled ? 0.28 : 1;
+    tone(ctx, out, time, 860, 820, 0.18, "triangle", 0.7 * level);
+    tone(ctx, out, time, 1320, 1260, 0.14, "square", 0.26 * level);
   }
 
   function playSample(ctx, sound, out, time, level, playbackRate = 1) {
