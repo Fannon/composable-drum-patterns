@@ -39,9 +39,22 @@ h3 { font-size: 0.95rem; line-height: 1.2; }
   z-index: 4;
 }
 .app-header p, .browse-summary p, .combine-top p { color: var(--muted); margin-top: 0.35rem; }
+.header-actions { display: flex; align-items: center; gap: 0.55rem; flex-wrap: wrap; justify-content: flex-end; }
 .view-tabs { display: flex; gap: 0.35rem; flex-wrap: wrap; }
 .tab { background: transparent; min-height: 2.25rem; }
 .tab.is-active { background: var(--ink); color: #fff; border-color: var(--ink); }
+.github-link {
+  min-height: 2.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0.5rem 0.7rem;
+  background: transparent;
+  color: var(--ink);
+}
+.github-icon { inline-size: 1rem; block-size: 1rem; fill: currentColor; flex: 0 0 auto; }
 .segmented { display: flex; flex-wrap: wrap; }
 .segmented button {
   background: transparent;
