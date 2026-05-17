@@ -56,12 +56,11 @@
   const $ = (selector) => document.querySelector(selector);
   const els = {
     groupTabs: $("#groupTabs"),
-    collection: $("#collectionFilter"),
+    collectionTabs: $("#collectionTabs"),
     search: $("#searchInput"),
     layout: $("#layoutSelect"),
     groupTitle: $("#groupTitle"),
     groupSummary: $("#groupSummary"),
-    legend: $("#clusterLegend"),
     grid: $("#patternGrid"),
     template: $("#patternCardTemplate"),
     browse: $("#browseView"),
@@ -93,13 +92,18 @@
       els.groupTabs.append(button);
       state.selected[group] = entries.find((entry) => entry.group === group && entry.collection === "basics")?.id ?? null;
     });
+    collectionOptions().forEach(({ value, label }) => {
+      const button = document.createElement("button");
+      button.textContent = label;
+      button.dataset.collection = value;
+      button.addEventListener("click", () => { state.collection = value; renderBrowse(); });
+      els.collectionTabs.append(button);
+    });
     catalog.collections.forEach((collection) => {
-      els.collection.add(new Option(title(collection), collection));
       els.combineCollection.add(new Option(title(collection), collection));
     });
     catalog.layouts.forEach((layout) => els.layout.add(new Option(layout, layout)));
     document.querySelectorAll("[data-view]").forEach((button) => button.addEventListener("click", () => setView(button.dataset.view)));
-    els.collection.addEventListener("change", () => { state.collection = els.collection.value; renderBrowse(); });
     els.search.addEventListener("input", () => { state.search = els.search.value.trim().toLowerCase(); renderBrowse(); });
     els.layout.addEventListener("change", () => { state.layout = els.layout.value; renderBrowse(); });
     els.combineSearch.addEventListener("input", () => { state.combineSearch = els.combineSearch.value.trim().toLowerCase(); renderCombine(); });
@@ -192,7 +196,6 @@
     }
 
     setView(state.activeView);
-    els.collection.value = state.collection;
     els.search.value = state.search;
     els.layout.value = state.layout;
     els.combineSearch.value = state.combineSearch;
@@ -210,11 +213,11 @@
 
   function renderBrowse() {
     els.groupTabs.querySelectorAll("button").forEach((button) => button.classList.toggle("is-active", button.dataset.group === state.group));
+    els.collectionTabs.querySelectorAll("button").forEach((button) => button.classList.toggle("is-active", button.dataset.collection === state.collection));
     const all = state.group === "All" ? entries : entries.filter((entry) => entry.group === state.group);
     const visible = filterEntries(all, state.collection, state.search);
     els.groupTitle.textContent = `${state.group === "All" ? "All" : groupLabel(state.group)} Patterns`;
-    els.groupSummary.textContent = `${visible.length} shown of ${all.length}. One-bar clips repeat 4x, two-bar clips 2x, four-bar clips 1x.`;
-    els.legend.replaceChildren(...legend(all));
+    els.groupSummary.textContent = `${visible.length} shown of ${all.length}`;
     els.grid.replaceChildren(...(visible.length ? visible.map(card) : [emptyState("No clips match the current filters.")]));
     writeHash();
   }
@@ -237,6 +240,13 @@
       return [entry.id, entry.name, entry.collection, entry.tier, ...entry.tags, ...entry.applicableGenres, ...entry.voices, ...entry.articulations, String(entry.energy), ...entry.usedSounds.map(soundLabel)]
         .filter(Boolean).join(" ").toLowerCase().includes(query);
     });
+  }
+
+  function collectionOptions() {
+    return [
+      { value: "all", label: "All" },
+      ...catalog.collections.map((collection) => ({ value: collection, label: title(collection) })),
+    ];
   }
 
   function combineEntriesFor(group) {
@@ -623,7 +633,7 @@
 
   function kick(ctx, out, time, alternate) {
     out.gain.value *= 1.15;
-    const sampled = playSample(ctx, alternate ? "kickB" : "kick", out, time, alternate ? 0.82 : 0.86, 1);
+    const sampled = playSample(ctx, alternate ? "kickB" : "kick", out, time, alternate ? 0.92 : 0.86, 1);
     const level = sampled ? 0.35 : 1;
     const body = alternate ? 39 : 46;
     const osc = ctx.createOscillator();
@@ -991,15 +1001,6 @@
     div.className = "empty-state";
     div.textContent = text;
     return div;
-  }
-  function legend(source) {
-    const counts = {};
-    source.forEach((entry) => {
-      counts[entry.collection] = (counts[entry.collection] ?? 0) + 1;
-      const length = `${entry.bars} bar${entry.bars === 1 ? "" : "s"}`;
-      counts[length] = (counts[length] ?? 0) + 1;
-    });
-    return Object.entries(counts).map(([label, count]) => chip(`${title(label)} ${count}`));
   }
 
   init();

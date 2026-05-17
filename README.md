@@ -30,8 +30,9 @@ Audio samples are sourced from [Sampled](https://github.com/oramics/sampled)
 Every abstract drum sound has a browser playback sample:
 
 - Roland TR-505: kick, rim, clap, snare, hi-hats, crash, ride, ride bell, cowbell, toms
-- Roland TR-808: kick B, shaker
+- Roland TR-808: shaker
 - LinnDrum LM-2: tambourine
+- MRK-2: kick B
 
 Drum pattern synthesis uses the Web Audio API with additional synthesized drum
 sounds as fallback.

@@ -21,10 +21,10 @@
       <section id="browseView" class="view is-active">
         <div class="toolbar">
           <div class="segmented" id="groupTabs" aria-label="Drum groups"></div>
-          <label class="field">
+          <div class="field">
             <span>Collection</span>
-            <select id="collectionFilter"><option value="all">All</option></select>
-          </label>
+            <div class="segmented segmented-plain" id="collectionTabs" aria-label="Collections"></div>
+          </div>
           <label class="field grow">
             <span>Search</span>
             <input id="searchInput" type="search" placeholder="name, id, tag, sound" />
@@ -34,12 +34,9 @@
             <select id="layoutSelect"></select>
           </label>
         </div>
-        <div class="relation-panel">
-          <div>
-            <h2 id="groupTitle"></h2>
-            <p id="groupSummary"></p>
-          </div>
-          <div id="clusterLegend" class="legend"></div>
+        <div class="browse-summary">
+          <h2 id="groupTitle"></h2>
+          <p id="groupSummary"></p>
         </div>
         <div id="patternGrid" class="pattern-grid"></div>
       </section>
@@ -89,7 +86,7 @@
             <input id="combineSearch" type="search" placeholder="filter clips" />
           </label>
           <label class="field compact">
-            <span>Collection</span>
+            <span>Pattern Category</span>
             <select id="combineCollection"><option value="all">All</option></select>
           </label>
         </div>
