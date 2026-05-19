@@ -4,7 +4,37 @@
   const groups = catalog.groups;
   const colors = { Kick: "var(--kick)", Snare: "var(--snare)", Hats: "var(--hats)", Toms: "var(--toms)", Perc: "var(--perc)" };
   const groupLabels = { Kick: "Kick", Snare: "Snare", Hats: "Hats", Toms: "Toms / Fills", Perc: "Perc / Foley" };
-  const gmNotes = { kick: 36, kickB: 35, snare: 38, clap: 39, rimshot: 37, hatClosed: 42, hatOpen: 46, ride: 51, rideBell: 53, crash: 49, tomLow: 45, tomMid: 48, tomHigh: 50, tambourine: 54, cowbell: 56, shaker: 70 };
+  const layoutNotes = {
+    Bitwig: { kick: 36, kickB: 40, snare: 37, clap: 41, rimshot: 42, hatClosed: 38, hatOpen: 39, ride: 43, rideBell: 49, crash: 47, tomLow: 44, tomMid: 45, tomHigh: 46, tambourine: 50, cowbell: 51, shaker: 48 },
+    Ableton: { kick: 36, kickB: 40, snare: 38, clap: 39, rimshot: 37, hatClosed: 42, hatOpen: 46, ride: 51, rideBell: 50, crash: 49, tomLow: 44, tomMid: 45, tomHigh: 47, tambourine: 48, cowbell: 52, shaker: 43 },
+    GM: { kick: 36, kickB: 35, snare: 38, clap: 39, rimshot: 37, hatClosed: 42, hatOpen: 46, ride: 51, rideBell: 53, crash: 49, tomLow: 45, tomMid: 48, tomHigh: 50, tambourine: 54, cowbell: 56, shaker: 70 },
+    Triaz: { kick: 36, kickB: 37, snare: 38, clap: 39, rimshot: 40, hatClosed: 42, hatOpen: 43, ride: 47, rideBell: 47, crash: 46, tomLow: 41, tomMid: 44, tomHigh: 45, tambourine: 44, cowbell: 37, shaker: 37 },
+    XO: { kick: 36, kickB: 37, snare: 38, clap: 39, rimshot: 42, hatClosed: 40, hatOpen: 41, ride: 42, rideBell: 42, crash: 43, tomLow: 42, tomMid: 43, tomHigh: 43, tambourine: 42, cowbell: 42, shaker: 43 },
+    AD2: { kick: 36, kickB: 65, snare: 38, clap: 44, rimshot: 37, hatClosed: 49, hatOpen: 54, ride: 60, rideBell: 61, crash: 77, tomLow: 67, tomMid: 69, tomHigh: 71, tambourine: 96, cowbell: 47, shaker: 101 },
+  };
+  const layoutConflictAlternates = {
+    Triaz: {
+      kickB: [35],
+      ride: [51],
+      rideBell: [49, 53],
+      tomMid: [48],
+      tambourine: [50, 54],
+      cowbell: [51, 56],
+      shaker: [48, 70],
+    },
+    XO: {
+      rimshot: [39],
+      ride: [43],
+      rideBell: [43],
+      crash: [42],
+      tomLow: [43],
+      tomMid: [42],
+      tomHigh: [42],
+      tambourine: [43],
+      cowbell: [43],
+      shaker: [42],
+    },
+  };
   const sampleSources = {
     kick: "samples/kick.wav",
     kickB: "samples/kick-b.wav",
@@ -920,11 +950,11 @@
   }
 
   function downloadSingleMidi(entry) {
-    const bytes = buildMidi([entry], 16);
+    const bytes = buildMidi([entry], 16, state.layout);
     const url = URL.createObjectURL(new Blob([bytes], { type: "audio/midi" }));
     const link = document.createElement("a");
     link.href = url;
-    link.download = `${entry.id}-${entry.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}.mid`;
+    link.download = `${state.layout}-${entry.id}-${entry.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}.mid`;
     link.click();
     URL.revokeObjectURL(url);
   }
@@ -932,18 +962,20 @@
   function downloadCombinedMidi() {
     const selected = groups.map((group) => entryById(state.selected[group])).filter(Boolean);
     if (!selected.length) return;
-    const bytes = buildMidi(selected, 16);
+    const bytes = buildMidi(selected, 16, state.layout);
     const url = URL.createObjectURL(new Blob([bytes], { type: "audio/midi" }));
     const link = document.createElement("a");
     link.href = url;
-    link.download = `combined-${selected.map((entry) => entry.id).join("-")}.mid`;
+    link.download = `${state.layout}-combined-${selected.map((entry) => entry.id).join("-")}.mid`;
     link.click();
     URL.revokeObjectURL(url);
   }
 
-  function buildMidi(selected, totalBeats) {
+  function buildMidi(selected, totalBeats, layoutName = "GM") {
     const ppq = 480;
     const events = [];
+    const notes = layoutNotes[layoutName] ?? layoutNotes.GM;
+    const occupiedByTick = new Map();
     selected.forEach((entry) => {
       const repeats = Math.max(1, Math.ceil(totalBeats / entry.lengthBeats));
       for (let repeat = 0; repeat < repeats; repeat += 1) {
@@ -951,21 +983,58 @@
           const time = hit.time + repeat * entry.lengthBeats;
           if (time >= totalBeats) return;
           const tick = Math.round(time * ppq);
-          const note = gmNotes[hit.sound] ?? hit.note;
+          const occupiedAtTick = occupiedByTick.get(tick) ?? new Map();
+          const note = resolveLayoutNote(hit.sound, layoutName, notes, occupiedAtTick, hit.note);
+          occupiedAtTick.set(note, hit.sound);
+          occupiedByTick.set(tick, occupiedAtTick);
           const dur = Math.max(24, Math.round((hit.duration || 0.1) * ppq));
           events.push({ tick, bytes: [0x99, note, hit.velocity] }, { tick: tick + dur, bytes: [0x89, note, 0] });
         });
       }
     });
-    events.sort((a, b) => a.tick - b.tick);
+    const coalesced = coalesceMidiEvents(events);
+    coalesced.sort((a, b) => a.tick - b.tick);
     const track = [...meta("Combined Drum Pattern")];
     let last = 0;
-    events.forEach((event) => {
+    coalesced.forEach((event) => {
       track.push(...varLen(event.tick - last), ...event.bytes);
       last = event.tick;
     });
     track.push(...varLen(totalBeats * ppq - last), 0xff, 0x2f, 0);
     return new Uint8Array([...ascii("MThd"), 0, 0, 0, 6, 0, 0, 0, 1, ppq >> 8, ppq & 255, ...ascii("MTrk"), ...u32(track.length), ...track]);
+  }
+
+  function resolveLayoutNote(sound, layoutName, notes, occupiedAtTick, fallbackNote) {
+    const preferred = notes[sound] ?? fallbackNote;
+    const occupiedSound = occupiedAtTick.get(preferred);
+    if (!occupiedSound || occupiedSound === sound) return preferred;
+    for (const alternate of layoutConflictAlternates[layoutName]?.[sound] ?? []) {
+      if (!occupiedAtTick.has(alternate)) return alternate;
+    }
+    return preferred;
+  }
+
+  function coalesceMidiEvents(events) {
+    const hits = new Map();
+    events.forEach((event) => {
+      const status = event.bytes[0] & 0xf0;
+      if (status !== 0x90 || event.bytes[2] <= 0) return;
+      const off = events.find((candidate) =>
+        candidate.tick >= event.tick &&
+        (candidate.bytes[0] & 0xf0) === 0x80 &&
+        candidate.bytes[1] === event.bytes[1]
+      );
+      const key = `${event.tick}:${event.bytes[1]}`;
+      const existing = hits.get(key);
+      const duration = off ? off.tick - event.tick : 24;
+      if (!existing || event.bytes[2] > existing.velocity || duration > existing.duration) {
+        hits.set(key, { tick: event.tick, note: event.bytes[1], velocity: Math.max(event.bytes[2], existing?.velocity ?? 0), duration: Math.max(duration, existing?.duration ?? 0) });
+      }
+    });
+    return [...hits.values()].flatMap((hit) => [
+      { tick: hit.tick, bytes: [0x99, hit.note, hit.velocity] },
+      { tick: hit.tick + hit.duration, bytes: [0x89, hit.note, 0] },
+    ]);
   }
 
   function meta(text) {
