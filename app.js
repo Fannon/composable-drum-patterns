@@ -4,37 +4,8 @@
   const groups = catalog.groups;
   const colors = { Kick: "var(--kick)", Snare: "var(--snare)", Hats: "var(--hats)", Toms: "var(--toms)", Perc: "var(--perc)" };
   const groupLabels = { Kick: "Kick", Snare: "Snare", Hats: "Hats", Toms: "Toms / Fills", Perc: "Perc / Foley" };
-  const layoutNotes = {
-    Bitwig: { kick: 36, kickB: 40, snare: 37, clap: 41, rimshot: 42, hatClosed: 38, hatOpen: 39, ride: 43, rideBell: 49, crash: 47, tomLow: 44, tomMid: 45, tomHigh: 46, tambourine: 50, cowbell: 51, shaker: 48 },
-    Ableton: { kick: 36, kickB: 40, snare: 38, clap: 39, rimshot: 37, hatClosed: 42, hatOpen: 46, ride: 51, rideBell: 50, crash: 49, tomLow: 44, tomMid: 45, tomHigh: 47, tambourine: 48, cowbell: 52, shaker: 43 },
-    GM: { kick: 36, kickB: 35, snare: 38, clap: 39, rimshot: 37, hatClosed: 42, hatOpen: 46, ride: 51, rideBell: 53, crash: 49, tomLow: 45, tomMid: 48, tomHigh: 50, tambourine: 54, cowbell: 56, shaker: 70 },
-    Triaz: { kick: 36, kickB: 37, snare: 38, clap: 39, rimshot: 40, hatClosed: 42, hatOpen: 43, ride: 47, rideBell: 47, crash: 46, tomLow: 41, tomMid: 44, tomHigh: 45, tambourine: 44, cowbell: 37, shaker: 37 },
-    XO: { kick: 36, kickB: 37, snare: 38, clap: 39, rimshot: 42, hatClosed: 40, hatOpen: 41, ride: 42, rideBell: 42, crash: 43, tomLow: 42, tomMid: 43, tomHigh: 43, tambourine: 42, cowbell: 42, shaker: 43 },
-    AD2: { kick: 36, kickB: 65, snare: 38, clap: 44, rimshot: 37, hatClosed: 49, hatOpen: 54, ride: 60, rideBell: 61, crash: 77, tomLow: 67, tomMid: 69, tomHigh: 71, tambourine: 96, cowbell: 47, shaker: 101 },
-  };
-  const layoutConflictAlternates = {
-    Triaz: {
-      kickB: [35],
-      ride: [51],
-      rideBell: [49, 53],
-      tomMid: [48],
-      tambourine: [50, 54],
-      cowbell: [51, 56],
-      shaker: [48, 70],
-    },
-    XO: {
-      rimshot: [39],
-      ride: [43],
-      rideBell: [43],
-      crash: [42],
-      tomLow: [43],
-      tomMid: [42],
-      tomHigh: [42],
-      tambourine: [43],
-      cowbell: [43],
-      shaker: [42],
-    },
-  };
+  const layoutNotes = catalog.layoutNotes;
+  const layoutConflictAlternates = catalog.layoutConflictAlternates;
   const sampleSources = {
     kick: "samples/kick.wav",
     kickB: "samples/kick-b.wav",
